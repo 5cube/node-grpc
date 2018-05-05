@@ -1,0 +1,26 @@
+syntax = "proto3"; //Specify proto3 version.
+
+package products; //Optional: unique package name.
+
+service ProductService {
+  rpc List (Empty) returns (ProductList);
+  rpc Insert (Product) returns (Empty);
+  rpc Get (ProductId) returns (ProductList);
+  rpc Remove (ProductId) returns (Empty);
+}
+
+// Message Type definition for an Product.
+message Product {
+  int32 productId = 1;
+  string name = 2;
+}
+
+message ProductList {
+  repeated Product product = 1;
+}
+
+message ProductId {
+  int32 productId = 1;
+}
+
+message Empty {}
