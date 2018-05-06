@@ -15,50 +15,33 @@ mongoose.Promise = global.Promise;
 const PROTO_PATH = __dirname + '/../protos/product_info.proto';
 
 const proto = grpc.load(PROTO_PATH);
-const server = new grpc.Server();
 const productService = require('../services/products');
 
-server.addService(proto.products.ProductService.service, {
+function main () {
+  const server = new grpc.Server();
 
-  List(call, callback) {
-    productService.list(callback);
-  },
+  server.addService(proto.products.ProductService.service, {
+    list (call, callback) {
+      productService.findAll(callback);
+    },
+    get (call, callback) {
+      productService.findById(call.request.productId, callback);
+    },
+    remove (call, callback) {
+      productService.remove(call.request.productId, callback);
+    },
+    insert (call, callback) {
+      const payload = {
+        name: call.request.name
+      };
+      const product = new productService(payload);
+      product.add(callback);
+    }
+  });
 
-  get(call, callback) {
-    const payload = {
-      criteria: {
-        productId: call.request.productId
-      },
-      projections: {
-        _id: 0, __v: 0
-      },
-      options: {
-        lean: true
-      }
-    };
-    const product = new productService(payload);
-    product.fetch(callback);
-  },
+  server.bind('0.0.0.0:50050', grpc.ServerCredentials.createInsecure());
+  server.start();
+  console.log('grpc server running on port:', '0.0.0.0:50050');
+}
 
-  Insert(call, callback) {
-    const product = new productService({
-      productId: call.request.productId,
-      name: call.request.name
-    });
-    product.add(callback);
-  },
-
-  remove(call, callback) {
-    const criteria = {
-      productId: call.request.productId,
-    };
-    const product = new productService(criteria);
-    product.remove(criteria, callback);
-  },
-});
-
-
-server.bind('0.0.0.0:50050', grpc.ServerCredentials.createInsecure());
-
-server.start();
-console.log('grpc server running on port:', '0.0.0.0:50050');
+main();

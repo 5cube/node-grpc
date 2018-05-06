@@ -23,7 +23,7 @@ const productSchema = mongoose.Schema({
 });
 
 productSchema.pre('update', function () {
-  this.update({}, { $set: { updatedAt: new Date(), status: 'updated' } });
+  this.update({}, { $set: { updatedAt: new Date() } });
 });
 
 productSchema.pre('save', function (next) {
