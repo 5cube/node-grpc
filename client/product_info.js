@@ -1,4 +1,6 @@
 const PROTO_PATH = __dirname + '/../protos/product_info.proto';
+const HOST = 'product-info.igorserver.ru';
+const PORT = '9001';
 
 const grpc = require('grpc');
 const proto = grpc.load(PROTO_PATH);
@@ -44,7 +46,7 @@ function insert (client, payload) {
 }
 
 function main () {
-  const client = new proto.products.ProductService('localhost:50050', grpc.credentials.createInsecure());
+  const client = new proto.products.ProductService(`${HOST}:${PORT}`, grpc.credentials.createInsecure());
   if (process.argv.length >= 3) {
     if (process.argv[2] === 'get') {
       get(client, Number.parseInt(process.argv[3]));
